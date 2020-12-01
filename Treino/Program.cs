@@ -1,7 +1,7 @@
 ﻿using System;
-using Treino.Entities;
-using Treino.Entities.Enums;
 using System.Globalization;
+using System.Collections.Generic;
+using Treino.Entities;
 
 namespace Treino
 {
@@ -9,50 +9,51 @@ namespace Treino
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Enter cliente data:");
-            Console.Write("Name: ");
-            string name = Console.ReadLine();
-            Console.Write("Email: ");
-            string email = Console.ReadLine();
-            Console.Write("Birth date (DD/MM/YYYY): ");
-            DateTime birthDate = DateTime.Parse(Console.ReadLine());
+            List<TaxPayer> list = new List<TaxPayer>();
 
-            Client client = new Client(name, email, birthDate);
+            Console.Write("Enter the number of tax payers: ");
+            int n = int.Parse(Console.ReadLine());
 
             Console.WriteLine();
 
-            Console.WriteLine("Enter order data:");
-            Console.Write("Status: ");
-            OrderStatus status = Enum.Parse<OrderStatus>(Console.ReadLine());
-            Console.Write("How many items to this order? ");
-            int x = int.Parse(Console.ReadLine());
-
-            Order order = new Order(DateTime.Now, status, client);
-
-            Console.WriteLine();
-
-            for (int i = 1; i <= x; i++)
+            for(int i = 1; i <= n; i++)
             {
-                Console.WriteLine($"Enter #{i} item data:");
-                Console.Write("Product name: ");
-                string productName = Console.ReadLine();
-                Console.Write("Product price: ");
-                double price = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+                Console.WriteLine($"Tax payer #{i} data:");
+                Console.Write("Individual or company (i/c)? ");
+                char c = char.Parse(Console.ReadLine());
+                Console.Write("Name: ");
+                string name = Console.ReadLine();
+                Console.Write("Anual income: ");
+                double anualIncome = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+                
+                if(c == 'i')
+                {
+                    Console.Write("Health expenditures: ");
+                    double healthExpenditures = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
 
-                Product product = new Product(productName, price);
+                    list.Add(new Individual(healthExpenditures, name, anualIncome));
+                }
+                else
+                {
+                    Console.Write("Number of employees: ");
+                    int numberOfEmployees = int.Parse(Console.ReadLine());
 
-                Console.Write("Quantity: ");
-                int quantity = int.Parse(Console.ReadLine());
-
-                OrderItem orderItem = new OrderItem(quantity, price, product);
-
-                order.AddItem(orderItem);
-               
+                    list.Add(new Company(numberOfEmployees, name, anualIncome));
+                }
                 Console.WriteLine();
             }
 
-            Console.WriteLine("ORDER SUMARY:");
-            Console.WriteLine(order);
+            Console.WriteLine("TAXES PAID:");
+            double sum = 0.0;
+            foreach(TaxPayer tp in list)
+            {
+                Console.WriteLine(tp.Name + ": $ " + tp.Tax().ToString("F2", CultureInfo.InvariantCulture));
+                sum += tp.Tax();
+            }
+
+            Console.WriteLine();
+
+            Console.WriteLine("TOTAL TAXES: $ " + sum.ToString("F2", CultureInfo.InvariantCulture));
         }
     }
 }
